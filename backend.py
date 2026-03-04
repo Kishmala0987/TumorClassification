@@ -124,6 +124,9 @@ if uploaded_file:
 
         with col1:
             st.image(image, caption="Uploaded Image", use_container_width=True)
-
         with col2:
             st.image(cam, caption="Grad-CAM Visualization", use_container_width=True)
+
+else:
+    st.write("For Reference")
+    st.image(r"C:\Users\PMLS\Desktop\TumorClassifier.png")
