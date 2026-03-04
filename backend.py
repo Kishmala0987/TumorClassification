@@ -129,4 +129,5 @@ if uploaded_file:
 
 else:
     st.write("For Reference")
-    st.image(r"C:\Users\PMLS\Desktop\TumorClassifier.png")
+    st.image(r"TumorClassifier.png")
+
