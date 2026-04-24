@@ -62,7 +62,7 @@ We use **Grad-CAM** to highlight regions influencing predictions.
 --
 ## GRAD CAM++
 
-<img width="1105" height="731" alt="image" src="https://github.com/user-attachments/assets/b680e10e-bedb-44bd-9018-d47d28e69d55" />
+<img width="970" height="503" alt="image" src="https://github.com/user-attachments/assets/adca30a7-da80-424f-a69b-ba51c4081d22" />
 
 --
 
