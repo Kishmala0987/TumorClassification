@@ -16,9 +16,8 @@ CLASS_LABELS = ["glioma", "meningioma", "notumor", "pituitary"]
 # MODEL  (loaded once, reused everywhere)
 # ─────────────────────────────────────────────
 _model = None
-MODEL_PATH = "model.h5"
-FILE_ID = "1l0TKUbQNtBQ_RNMpdf7YnkH-bPXhq4Hb"
-
+MODEL_PATH = "model.keras"
+FILE_ID = "1xQfaJyvTUgC_SyNqAaKFAeHxY8yUwNth"
 def download_model():
     if not os.path.exists(MODEL_PATH):
         url = f"https://drive.google.com/uc?id={FILE_ID}"
@@ -28,10 +27,26 @@ def get_model():
     global _model
     if _model is None:
         download_model()
-        _model = load_model(MODEL_PATH, compile=False)
-        _model.predict(np.zeros((1, 128, 128, 3)))
-    return _model
 
+        try:
+            _model = tf.keras.models.load_model(
+                MODEL_PATH,
+                compile=False,
+                safe_mode=False
+            )
+        except Exception:
+            _model = tf.keras.models.load_model(
+                MODEL_PATH,
+                compile=False,
+                custom_objects={
+                    "InputLayer": tf.keras.layers.InputLayer
+                }
+            )
+
+        # warm-up
+        _model.predict(np.zeros((1, 128, 128, 3)))
+
+    return _model
 # ─────────────────────────────────────────────
 # GRAD-CAM++
 # ─────────────────────────────────────────────
