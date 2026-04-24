@@ -5,27 +5,32 @@ from tensorflow.keras.models import load_model
 from lime import lime_image
 from skimage.segmentation import mark_boundaries
 from tensorflow.keras.preprocessing.image import load_img
-
+import gdown
+import os
 # ─────────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────────
 IMAGE_SIZE   = 128
 CLASS_LABELS = ["glioma", "meningioma", "notumor", "pituitary"]
-MODEL_PATH   = "model.h5"
-
 # ─────────────────────────────────────────────
 # MODEL  (loaded once, reused everywhere)
 # ─────────────────────────────────────────────
 _model = None
+MODEL_PATH = "model.h5"
+FILE_ID = "1l0TKUbQNtBQ_RNMpdf7YnkH-bPXhq4Hb"
+
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        url = f"https://drive.google.com/uc?id={FILE_ID}"
+        gdown.download(url, MODEL_PATH, quiet=False)
 
 def get_model():
-    """Lazy-load and cache the Keras model."""
     global _model
     if _model is None:
+        download_model()
         _model = load_model(MODEL_PATH, compile=False)
-        _model.predict(np.zeros((1, IMAGE_SIZE, IMAGE_SIZE, 3)), verbose=0)
+        _model.predict(np.zeros((1, 128, 128, 3)))
     return _model
-
 
 # ─────────────────────────────────────────────
 # GRAD-CAM++
