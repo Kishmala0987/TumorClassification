@@ -58,11 +58,19 @@ We use **Grad-CAM** to highlight regions influencing predictions.
 
 ## 🖼️ Sample Output
 
-### Prediction Example
+### Explainaibilty AI
+--
+## GRAD CAM++
 
-<img width="704" height="414" alt="image" src="https://github.com/user-attachments/assets/59c7e314-fed9-4a06-9003-33c11122ad83" />
+<img width="1105" height="731" alt="image" src="https://github.com/user-attachments/assets/b680e10e-bedb-44bd-9018-d47d28e69d55" />
 
+--
 
+## LIME
+
+<img width="954" height="520" alt="image" src="https://github.com/user-attachments/assets/9c6e54bd-20a3-4e7b-b6fb-9dc05978c608" />
+
+--
 ---
 
 ## ⚙️ Tech Stack
