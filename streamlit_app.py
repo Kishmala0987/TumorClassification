@@ -171,7 +171,7 @@ w, h  = image.size
 col_img, col_meta = st.columns([1, 2])
 with col_img:
     st.markdown("<div class='section-title'>Input Image</div>", unsafe_allow_html=True)
-    st.image(image, use_container_width=True)
+    st.image(image, use_column_width=True)
 
 with col_meta:
     st.markdown("<div class='section-title'>File Info</div>", unsafe_allow_html=True)
@@ -183,7 +183,7 @@ with col_meta:
     </div>
     """, unsafe_allow_html=True)
     st.markdown(f"`{uploaded.name}`")
-    run = st.button("🔬  Analyse MRI", use_container_width=True)
+    run = st.button("🔬  Analyse MRI", use_column_width=True)
 
 if not run:
     st.stop()
@@ -257,17 +257,17 @@ st.markdown("<div class='section-title'>Explainability</div>", unsafe_allow_html
 c1, c2, c3 = st.columns(3)
 
 with c1:
-    st.image(image, caption="Original MRI", use_container_width=True)
+    st.image(image, caption="Original MRI", use_column_width=True)
 
 with c2:
     st.image(
         cam_img,
         caption=f"Grad-CAM++ | Focus Regions ({class_name}, {confidence * 100:.1f}%)",
-        use_container_width=True
+        use_column_width=True
     )
 with c3:
     if lime_img is not None:
-        st.image(lime_img, caption="LIME Superpixels", use_container_width=True)
+        st.image(lime_img, caption="LIME Superpixels", use_column_width=True)
     else:
         st.info("LIME disabled")
 if fused_img is not None:
@@ -276,7 +276,7 @@ if fused_img is not None:
     st.image(
         resized,
         caption="Combined Explanation (Model + Local + Spatial)",
-        use_container_width=True,
+        use_column_width=True,
     )
 # ─────────────────────────────────────────────
 # CLASS PROBABILITIES TABLE
