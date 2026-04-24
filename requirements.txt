@@ -1,8 +1,8 @@
-streamlit==1.36.0
-numpy==1.26.4
-pillow
-opencv-python-headless
+streamlit
 tensorflow==2.15.0
+numpy
+opencv-python-headless
+pillow
 lime
 scikit-image
 gdown
