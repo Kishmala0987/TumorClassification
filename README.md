@@ -68,9 +68,15 @@ We use **Grad-CAM** to highlight regions influencing predictions.
 
 ## LIME
 
-<img width="954" height="520" alt="image" src="https://github.com/user-attachments/assets/9c6e54bd-20a3-4e7b-b6fb-9dc05978c608" />
+<img width="963" height="513" alt="image" src="https://github.com/user-attachments/assets/ee4ce54a-2680-4362-9960-6cfc056e2981" />
 
 --
+
+## Overlay LIME, Grad-CAM, and top predictions
+
+<img width="2663" height="1588" alt="image" src="https://github.com/user-attachments/assets/062b0bc9-2eb4-41d2-bee8-47fd786942de" />
+
+
 ---
 
 ## ⚙️ Tech Stack
