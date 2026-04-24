@@ -138,7 +138,7 @@ with st.sidebar:
     Input: 128×128 RGB
     </div>
     """, unsafe_allow_html=True)
-    use_lime = st.toggle("Enable LIME (slower)", value=True)
+    use_lime = st.toggle("Enable LIME (slower)", value=False)
 
 # ─────────────────────────────────────────────
 # UPLOAD
