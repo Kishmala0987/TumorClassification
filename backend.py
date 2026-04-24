@@ -17,7 +17,7 @@ CLASS_LABELS = ["glioma", "meningioma", "notumor", "pituitary"]
 # ─────────────────────────────────────────────
 _model = None
 MODEL_PATH = "model.keras"
-FILE_ID = "1xQfaJyvTUgC_SyNqAaKFAeHxY8yUwNth"
+FILE_ID = "1YKAdM5FpywFf6LU_749-fGKNXN6NvKV7"
 def download_model():
     if os.path.exists(MODEL_PATH):
         os.remove(MODEL_PATH)  # 🔥 force overwrite
