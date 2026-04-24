@@ -276,8 +276,7 @@ if fused_img is not None:
     st.image(
         resized,
         caption="Combined Explanation (Model + Local + Spatial)",
-        use_container_width=False,
-        width="400",
+        use_container_width=True,
     )
 # ─────────────────────────────────────────────
 # CLASS PROBABILITIES TABLE
