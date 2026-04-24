@@ -19,6 +19,9 @@ _model = None
 MODEL_PATH = "model.keras"
 FILE_ID = "1xQfaJyvTUgC_SyNqAaKFAeHxY8yUwNth"
 def download_model():
+    if os.path.exists(MODEL_PATH):
+        os.remove(MODEL_PATH)  # 🔥 force overwrite
+
     if not os.path.exists(MODEL_PATH):
         url = f"https://drive.google.com/uc?id={FILE_ID}"
         gdown.download(url, MODEL_PATH, quiet=False)
