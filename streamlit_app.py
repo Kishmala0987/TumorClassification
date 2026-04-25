@@ -194,7 +194,7 @@ if not run:
 try:
     model, predict_fn = load_backend()
 except Exception as e:
-    st.error(f"❌ Could not load model: {e}\n\nMake sure `model.h5` is in the same directory as `streamlit_app.py`.")
+    st.error(f"❌ Could not load model: {e}")
     st.stop()
 
 with st.spinner("Running inference + Grad-CAM++ + LIME…"):
@@ -254,30 +254,41 @@ st.markdown(f"""
 # ─────────────────────────────────────────────
 st.markdown("<div class='section-title'>Explainability</div>", unsafe_allow_html=True)
 
-c1, c2, c3 = st.columns(3)
+c1, c2, c3 = st.columns(3, gap="small")
 
 with c1:
-    st.image(image, caption="Original MRI", width=400)
+    st.image(image, caption="Original MRI", use_container_width=True)
 
 with c2:
     st.image(
         cam_img,
-        caption=f"Grad-CAM++ | Focus Regions ({class_name}, {confidence * 100:.1f}%)",
-        width = 400
+        caption=f"Grad-CAM++ · {class_name.capitalize()} ({confidence*100:.1f}%)",
+        use_container_width=True,
     )
+
 with c3:
     if lime_img is not None:
-        st.image(lime_img, caption="LIME Superpixels", width = 400)
+        st.image(lime_img, caption="LIME Superpixels", use_container_width=True)
     else:
-        st.info("LIME disabled")
+        st.markdown("""
+        <div style='border:1px dashed #2e2e55; border-radius:8px; padding:2rem;
+                    text-align:center; color:#444466; font-size:.78rem;
+                    font-family:Space Mono,monospace; letter-spacing:.08em'>
+          LIME DISABLED<br>
+          <span style='font-size:.68rem'>toggle in sidebar to enable</span>
+        </div>
+        """, unsafe_allow_html=True)
+
 if fused_img is not None:
     st.markdown("<div class='section-title'>Combined Explanation</div>", unsafe_allow_html=True)
-    resized = cv2.resize(fused_img, (400, 400))  # width, height
-    st.image(
-        resized,
-        caption="Combined Explanation (Model + Local + Spatial)",
-        width=400,
-    )
+    col_f1, col_f2, col_f3 = st.columns([1, 2, 1])
+    with col_f2:
+        st.image(
+            fused_img,
+            caption="Combined Explanation (Original 35% · CAM++ 30% · LIME 35%)",
+            use_container_width=True,
+        )
+
 # ─────────────────────────────────────────────
 # CLASS PROBABILITIES TABLE
 # ─────────────────────────────────────────────

@@ -58,40 +58,86 @@ def grad_cam_plus_plus(img_array: np.ndarray,
                        last_conv_layer_name: str = "block5_conv3",
                        class_idx: int = None) -> np.ndarray:
     """
-    Grad-CAM++ (replaces standard Grad-CAM).
+    Grad-CAM++ using a forward hook — zero graph surgery, works with any
+    Keras model structure (flat, nested, functional, sequential).
     img_array : float32 ndarray  (1, H, W, 3)  values in [0, 1]
     Returns   : float32 heatmap  (H_conv, W_conv) normalised to [0, 1]
     """
-    img_tensor = tf.convert_to_tensor(img_array, dtype=tf.float32)
 
-    base_model      = model.layers[0]
-    last_conv_layer = base_model.get_layer(last_conv_layer_name)
-    backbone        = tf.keras.Model(base_model.inputs, last_conv_layer.output)
+    # ── 1. find the target layer anywhere in the model tree ───────────
+    def find_layer(m, name):
+        for layer in m.layers:
+            if layer.name == name:
+                return layer
+            if hasattr(layer, 'layers'):
+                hit = find_layer(layer, name)
+                if hit is not None:
+                    return hit
+        return None
 
-    clf_in = tf.keras.Input(shape=last_conv_layer.output.shape[1:])
-    x = clf_in
-    layer_idx = base_model.layers.index(last_conv_layer)
-    for layer in base_model.layers[layer_idx + 1:]:
-        x = layer(x)
-    for layer in model.layers[1:]:
-        x = layer(x)
-    classifier = tf.keras.Model(clf_in, x)
+    target_layer = find_layer(model, last_conv_layer_name)
+    if target_layer is None:
+        names = []
+        def collect(m):
+            for l in m.layers:
+                names.append(f"{l.name}  ({type(l).__name__})")
+                if hasattr(l, 'layers'):
+                    collect(l)
+        collect(model)
+        raise ValueError(
+            f"Layer '{last_conv_layer_name}' not found.\n"
+            "Available layers:\n" + "\n".join(names)
+        )
 
-    with tf.GradientTape() as tape2:
-        with tf.GradientTape() as tape1:
-            conv_out = backbone(img_tensor)
-            tape1.watch(conv_out)
-            tape2.watch(conv_out)
-            preds = classifier(conv_out)
-            if class_idx is None:
-                class_idx = int(tf.argmax(preds[0]))
-            score = preds[:, class_idx]
-        g1 = tape1.gradient(score, conv_out)
-    g2 = tape2.gradient(g1, conv_out)
+    # ── 2. intercept conv output with a callback layer ─────────────────
+    # Monkey-patch the layer's __call__ to store its output in a list.
+    # This requires NO graph rewiring — it works at the Python call level.
+    conv_output_holder = []
+    original_call = target_layer.__class__.call
 
-    alpha   = g2 / (2.0 * g2 +
-                    tf.reduce_sum(conv_out * g2 * g1,
-                                  axis=(1, 2), keepdims=True) + 1e-7)
+    def hooked_call(self, *args, **kwargs):
+        result = original_call(self, *args, **kwargs)
+        if self is target_layer:
+            conv_output_holder.append(result)
+        return result
+
+    target_layer.__class__.call = hooked_call
+
+    # ── 3. run forward pass with GradientTape ─────────────────────────
+    img_tensor = tf.cast(img_array, tf.float32)
+    try:
+        with tf.GradientTape() as tape2:
+            with tf.GradientTape() as tape1:
+                conv_output_holder.clear()
+                preds = model(img_tensor, training=False)
+
+                if not conv_output_holder:
+                    raise RuntimeError(
+                        f"Hook did not fire — layer '{last_conv_layer_name}' "
+                        "was not called during the forward pass."
+                    )
+
+                conv_out = conv_output_holder[0]
+                tape1.watch(conv_out)
+                tape2.watch(conv_out)
+
+                if class_idx is None:
+                    class_idx = int(tf.argmax(preds[0]))
+                score = preds[:, class_idx]
+
+            g1 = tape1.gradient(score, conv_out)
+        g2 = tape2.gradient(g1, conv_out)
+
+    finally:
+        # always restore the original method — even if an error occurs
+        target_layer.__class__.call = original_call
+
+    # ── 4. Grad-CAM++ weighting ────────────────────────────────────────
+    alpha = g2 / (
+        2.0 * g2
+        + tf.reduce_sum(conv_out * g2 * g1, axis=(1, 2), keepdims=True)
+        + 1e-7
+    )
     weights = tf.reduce_sum(alpha * tf.nn.relu(g1), axis=(1, 2))
 
     cam = tf.reduce_sum(
@@ -102,14 +148,10 @@ def grad_cam_plus_plus(img_array: np.ndarray,
     if cam.max() > 0:
         cam /= cam.max()
     return cam.astype(np.float32)
-
-
 # ─────────────────────────────────────────────
 # LIME
 # ─────────────────────────────────────────────
-# ─────────────────────────────────────────────
-# LIME
-# ─────────────────────────────────────────────
+
 
 def explain_with_lime_overlay(img_rgb: np.ndarray, model):
     """
