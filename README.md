@@ -113,38 +113,6 @@ cd tumor-classification
 pip install -r requirements.txt
 ```
 
-### Train Model
-
-```bash
-python train.py
-```
-
-### Run Prediction
-
-```bash
-python predict.py --image path/to/mri.jpg
-```
-
-### Generate Explainability
-
-```bash
-python gradcam.py --image path/to/mri.jpg
-```
-
----
-
-## 📁 Project Structure
-
-```
-data/
-models/
-gradcam.py
-train.py
-predict.py
-utils.py
-README.md
-```
-
 ---
 
 ## 📌 Key Features
